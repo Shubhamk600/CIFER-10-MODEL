@@ -3,8 +3,6 @@ import torch
 import torch.nn as nn
 from torchvision import models, transforms
 from PIL import Image
-import requests
-from io import BytesIO
 
 st.title(" CIFAR-10 Image Classifier")
 
@@ -23,45 +21,18 @@ def load_model():
         nn.Dropout(0.4),
         nn.Linear(256, 10)
     )
-    model.load_state_dict(torch.load(r"resnet50_cifar10_state.pth", map_location="cpu"))  # ✅ your file
+    model.load_state_dict(torch.load(r"Cifar_Model_deployment\resnet50_cifar10_state.pth", map_location="cpu"))  # ✅ your file
     model.eval()
     return model
 
 model = load_model()
-st.subheader ("upload image of plane, car, bird, cat, deer,dog, frog, horse, ship,truck to get prediction")
+st.write("upload image of plane, car, bird, cat, deer,dog, frog, horse, ship,truck to get prediction")
 # --- Upload Section ---
-import requests
-from PIL import Image
-from io import BytesIO
-import streamlit as st
+uploaded = st.file_uploader(" Upload an image (jpg/png):", type=["jpg", "jpeg", "png"])
 
-uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
-image_url = st.text_input("Or enter Image URL:")
-
-image = None
-
-if uploaded_file is not None:
-    image = Image.open(uploaded_file)
-elif image_url:
-    try:
-        # Add headers to avoid 403 / redirection issues
-        headers = {"User-Agent": "Mozilla/5.0"}
-        response = requests.get(image_url, headers=headers, timeout=10)
-        response.raise_for_status()  # raise if not 200 OK
-
-        # Check content type
-        content_type = response.headers.get("Content-Type", "")
-        if "image" not in content_type:
-            st.error("❌ The provided URL does not point to an image file.")
-        else:
-            image = Image.open(BytesIO(response.content))
-
-    except Exception as e:
-        st.error(f"⚠️ Unable to load image: {e}")
-
-if image:
-    st.image(image, caption="Loaded Image", use_column_width=True)
-
+if uploaded:
+    img = Image.open(uploaded).convert("RGB")
+    st.image(img, caption="Uploaded Image", use_container_width=True)
 
     if st.button("🔍 Predict"):
         # Preprocess
