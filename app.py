@@ -21,7 +21,7 @@ def load_model():
         nn.Dropout(0.4),
         nn.Linear(256, 10)
     )
-    model.load_state_dict(torch.load(r"Cifar_Model_deployment\resnet50_cifar10_state.pth", map_location="cpu"))  # ✅ your file
+    model.load_state_dict(torch.load(r"resnet50_cifar10_state.pth", map_location="cpu"))  # ✅ your file
     model.eval()
     return model
 
