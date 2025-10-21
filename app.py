@@ -26,7 +26,7 @@ def load_model():
     return model
 
 model = load_model()
-st.markdown ("####upload image of plane, car, bird, cat, deer,dog, frog, horse, ship,truck to get prediction")
+st.subheader ("upload image of plane, car, bird, cat, deer,dog, frog, horse, ship,truck to get prediction")
 # --- Upload Section ---
 uploaded = st.file_uploader(" Upload an image (jpg/png):", type=["jpg", "jpeg", "png"])
 
