@@ -3,6 +3,8 @@ import torch
 import torch.nn as nn
 from torchvision import models, transforms
 from PIL import Image
+import requests
+from io import BytesIO
 
 st.title(" CIFAR-10 Image Classifier")
 
@@ -28,11 +30,21 @@ def load_model():
 model = load_model()
 st.subheader ("upload image of plane, car, bird, cat, deer,dog, frog, horse, ship,truck to get prediction")
 # --- Upload Section ---
-uploaded = st.file_uploader(" Upload an image (jpg/png):", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+image_url = st.text_input("Or enter Image URL:")
 
-if uploaded:
-    img = Image.open(uploaded).convert("RGB")
-    st.image(img, caption="Uploaded Image", use_container_width=True)
+if uploaded_file is not None:
+    image = Image.open(uploaded_file)
+elif image_url:
+    response = requests.get(image_url)
+    image = Image.open(BytesIO(response.content))
+else:
+    image = None
+
+if image:
+    st.image(image, caption="Selected Image", use_column_width=True)
+    # Run your model prediction here
+
 
     if st.button("🔍 Predict"):
         # Preprocess
