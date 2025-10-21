@@ -30,20 +30,37 @@ def load_model():
 model = load_model()
 st.subheader ("upload image of plane, car, bird, cat, deer,dog, frog, horse, ship,truck to get prediction")
 # --- Upload Section ---
+import requests
+from PIL import Image
+from io import BytesIO
+import streamlit as st
+
 uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 image_url = st.text_input("Or enter Image URL:")
+
+image = None
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
 elif image_url:
-    response = requests.get(image_url)
-    image = Image.open(BytesIO(response.content))
-else:
-    image = None
+    try:
+        # Add headers to avoid 403 / redirection issues
+        headers = {"User-Agent": "Mozilla/5.0"}
+        response = requests.get(image_url, headers=headers, timeout=10)
+        response.raise_for_status()  # raise if not 200 OK
+
+        # Check content type
+        content_type = response.headers.get("Content-Type", "")
+        if "image" not in content_type:
+            st.error("❌ The provided URL does not point to an image file.")
+        else:
+            image = Image.open(BytesIO(response.content))
+
+    except Exception as e:
+        st.error(f"⚠️ Unable to load image: {e}")
 
 if image:
-    st.image(image, caption="Selected Image", use_column_width=True)
-    # Run your model prediction here
+    st.image(image, caption="Loaded Image", use_column_width=True)
 
 
     if st.button("🔍 Predict"):
